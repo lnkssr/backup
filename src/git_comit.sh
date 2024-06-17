@@ -6,6 +6,6 @@ git pull
 
 git add .
 
-git commit -m arg1
+git commit -m $arg1
 
 git push

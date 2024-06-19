@@ -4,8 +4,6 @@ setup() {
     TEST_DIR=$(mktemp -d)
     HOME_DIR=$(mktemp -d)
     SCRIPT_PATH="$PWD/backup.sh"
-
-    # Ensure the script has execution permissions
     chmod +x "$SCRIPT_PATH"
 }
 
@@ -23,7 +21,6 @@ teardown() {
 @test "Скрипт создает архив" {
     HOME="$HOME_DIR" run bash "$SCRIPT_PATH" "$TEST_DIR"
     [ "$status" -eq 0 ]
-    # Проверяем, что архив создан
     ARCHIVE_COUNT=$(ls -1q "$TEST_DIR"/*.tar.gz | wc -l)
     [ "$ARCHIVE_COUNT" -gt 0 ]
 }
@@ -31,7 +28,6 @@ teardown() {
 @test "Скрипт устанавливает зависимости, если не указан параметр skip-install" {
     HOME="$HOME_DIR" run bash "$SCRIPT_PATH" "$TEST_DIR"
     [ "$status" -eq 0 ]
-    # Проверка установки зависимостей
     command -v rsync > /dev/null
     [ "$?" -eq 0 ]
     command -v tar > /dev/null
@@ -45,17 +41,14 @@ teardown() {
 @test "Скрипт не устанавливает зависимости, если указан параметр skip-install" {
     HOME="$HOME_DIR" run bash "$SCRIPT_PATH" "$TEST_DIR" skip-install
     [ "$status" -eq 0 ]
-    # Предполагаем, что зависимости могут быть не установлены в этом случае
 }
 
 @test "Скрипт создает зашифрованный архив, если указан пароль" {
     PASSWORD="testpassword"
     HOME="$HOME_DIR" run bash "$SCRIPT_PATH" "$TEST_DIR" "" "$PASSWORD"
     [ "$status" -eq 0 ]
-    # Проверяем, что зашифрованный архив создан
     ENCRYPTED_ARCHIVE_COUNT=$(ls -1q "$TEST_DIR"/*.tar.gz.enc | wc -l)
     [ "$ENCRYPTED_ARCHIVE_COUNT" -gt 0 ]
-    # Проверяем, что не зашифрованный архив удален
     ARCHIVE_COUNT=$(ls -1q "$TEST_DIR"/*.tar.gz | wc -l)
     [ "$ARCHIVE_COUNT" -eq 0 ]
 }
